@@ -52,7 +52,6 @@ class ToggleController extends ChangeNotifier {
         toggleType = ToggleType.moon;
       }
     });
-    onTap();
   }
 
   onTap() {
@@ -188,7 +187,7 @@ class _ToggleScreenState extends State<ToggleScreen>
                 ),
               ],
               border: Border.all(
-                width: 6,
+                width: 5.5,
                 color: Colors.white,
               ),
             ),
