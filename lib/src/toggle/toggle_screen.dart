@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 
-enum ToggleType {
-  sun,
-  moon,
-}
-
 class ToggleController extends ChangeNotifier {
   late AnimationController animationController;
   late AnimationController gentleController;
   late Animation<double> animation;
   late Animation<Color?> colorAnimation;
   late Animation<double> gentle;
-  var toggleType = ToggleType.sun;
 
   var begin = 0.0;
   var end = 1.0;
@@ -27,7 +21,7 @@ class ToggleController extends ChangeNotifier {
 
     animation = Tween<double>(begin: begin, end: end).animate(CurvedAnimation(
       parent: animationController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeInOutCubic,
     ));
 
     colorAnimation = ColorTween(
@@ -37,21 +31,13 @@ class ToggleController extends ChangeNotifier {
 
     gentleController = AnimationController(
       vsync: provider,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 300),
     );
 
     gentle = Tween<double>(begin: 0, end: 10).animate(CurvedAnimation(
       parent: gentleController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeInOutCubic,
     ));
-
-    animationController.addListener(() {
-      if (animationController.value == 0) {
-        toggleType = ToggleType.sun;
-      } else if (animationController.value == 1) {
-        toggleType = ToggleType.moon;
-      }
-    });
   }
 
   onTap() {
