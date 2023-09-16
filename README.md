@@ -32,4 +32,18 @@ again to switch back to the day theme.
 
 ![Screenshot night](screenshot/screenshot_sun.png)
 
+## Contributions
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open
+an issue or a pull request in this repository.
+
+## License
+
+This project is licensed under the MIT License. Make sure to replace `your-username` in the clone
+URL with your actual GitHub username. Additionally, you can add screenshots of the day and night
+themes by capturing them and placing the images in a folder named `screenshots` within the project
+directory.
+
+Feel free to customize the README.md file further based on your project requirements and additional
+information you want to include.
 
