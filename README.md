@@ -32,6 +32,8 @@ again to switch back to the day theme.
 
 ![Screenshot night](screenshot/screenshot_sun.png)
 
+[![Watch the video](screenshot/video.MP4)
+
 ## Contributions
 
 Contributions are welcome! If you find any issues or have suggestions for improvements, please open
