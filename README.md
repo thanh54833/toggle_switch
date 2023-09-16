@@ -32,7 +32,7 @@ again to switch back to the day theme.
 
 ![Screenshot night](screenshot/screenshot_sun.png)
 
-[![Watch the video](screenshot/video.MP4)
+![Watch the video](screenshot/video.MP4)
 
 ## Contributions
 
