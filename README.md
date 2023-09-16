@@ -30,6 +30,6 @@ again to switch back to the day theme.
 
 ![Screenshot sun](screenshot/screenshot_night.png)
 
-![Screenshot night](screenshot/screenshot_night.png)
+![Screenshot night](screenshot/screenshot_sun.png)
 
 
