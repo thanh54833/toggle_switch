@@ -1,16 +1,35 @@
-# animation
+# Flutter Animation Toggle Switch
 
-A new Flutter project.
+This Flutter project demonstrates an animation toggle switch that allows you to switch between a sun
+and night theme. The toggle switch animates the background color, sun icon color, and moon icon
+color.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To get started with this project, follow the instructions below.
 
-A few resources to get you started if this is your first Flutter project:
+### Prerequisites
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Flutter SDK: [Installation Guide](https://flutter.dev/docs/get-started/install)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Installation
+
+#### 1. Clone the repository:
+
+```bash
+git clone https://github.com/thanh54833/toggle_switch.git -b master
+```
+
+## Usage
+
+When you launch the app, you'll see a sun and moon icon in the center of the screen. Press the "
+Switch to Night" button to toggle the animation and switch to the night theme. Press the button
+again to switch back to the day theme.
+
+## Screenshots
+
+![Screenshot sun](screenshot/screenshot_night.png)
+
+![Screenshot night](screenshot/screenshot_night.png)
+
+
