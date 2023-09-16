@@ -81,7 +81,7 @@ class _ToggleScreenState extends State<ToggleScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
+      backgroundColor: const Color(0xFFe9bc47),
       body: Center(
         child: InkWell(
           splashColor: Colors.transparent,
@@ -99,6 +99,14 @@ class _ToggleScreenState extends State<ToggleScreen>
   var sizeThumb = 100.0;
   var marginHorizontal = 12.0;
   var borderRadius = 60.0;
+
+  _testWidget() {
+    return Container(
+      child: Container(
+        child: Container(),
+      ),
+    );
+  }
 
   _toggleWidget() {
     var distanceMove = widthToggle - sizeThumb - 2 * marginHorizontal;
