@@ -2,61 +2,63 @@ import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 
 class ToggleController extends ChangeNotifier {
-  late AnimationController animationController;
-  late AnimationController gentleController;
-  late Animation<double> animation;
-  late Animation<Color?> colorAnimation;
-  late Animation<double> gentle;
+  late AnimationController _animationController;
+  late Animation<Color?> _backgroundColorAnimation;
+
+  late AnimationController _toggleController;
+  late Animation<double> toggleAnimation;
+  late Animation<double> thumbAnimation;
 
   var begin = 0.0;
   var end = 1.0;
   var beginGentle = 0.0;
   var endGentle = 10.0;
 
-  void init(TickerProviderStateMixin provider) {
-    animationController = AnimationController(
+  onInit(TickerProviderStateMixin provider) {
+    _animationController = AnimationController(
       vsync: provider,
       duration: const Duration(milliseconds: 500),
     );
 
-    animation = Tween<double>(begin: begin, end: end).animate(CurvedAnimation(
-      parent: animationController,
+    toggleAnimation =
+        Tween<double>(begin: begin, end: end).animate(CurvedAnimation(
+      parent: _animationController,
       curve: Curves.easeInOutCubic,
     ));
 
-    colorAnimation = ColorTween(
+    _backgroundColorAnimation = ColorTween(
       begin: const Color(0xff00B1FD),
       end: const Color(0xff171B1D),
-    ).animate(animationController);
+    ).animate(_animationController);
 
-    gentleController = AnimationController(
+    _toggleController = AnimationController(
       vsync: provider,
       duration: const Duration(milliseconds: 300),
     );
 
-    gentle = Tween<double>(begin: 0, end: 10).animate(CurvedAnimation(
-      parent: gentleController,
+    thumbAnimation = Tween<double>(begin: 0, end: 10).animate(CurvedAnimation(
+      parent: _toggleController,
       curve: Curves.easeInOutCubic,
     ));
   }
 
   onTap() {
-    if (animationController.value == 0) {
-      animationController.forward().whenComplete(
+    if (_animationController.value == 0) {
+      _animationController.forward().whenComplete(
         () {
-          gentleController.forward().whenComplete(() {});
+          _toggleController.forward();
         },
       );
     } else {
-      animationController.reverse().whenComplete(() {
-        gentleController.reverse().whenComplete(() {});
+      _animationController.reverse().whenComplete(() {
+        _toggleController.reverse();
       });
     }
   }
 
   @override
   void dispose() {
-    animationController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 }
@@ -70,12 +72,17 @@ class ToggleScreen extends StatefulWidget {
 
 class _ToggleScreenState extends State<ToggleScreen>
     with TickerProviderStateMixin {
-  ToggleController controller = ToggleController();
+  final controller = ToggleController();
+  final _widthToggle = 300.0;
+  final _heightToggle = 125.0;
+  final _sizeThumb = 100.0;
+  final _marginHorizontal = 12.0;
+  final _borderRadius = 60.0;
 
   @override
   void initState() {
     super.initState();
-    controller.init(this);
+    controller.onInit(this);
   }
 
   @override
@@ -84,7 +91,6 @@ class _ToggleScreenState extends State<ToggleScreen>
       backgroundColor: const Color(0xFFe9bc47),
       body: Center(
         child: InkWell(
-          splashColor: Colors.transparent,
           onTap: () {
             controller.onTap();
           },
@@ -94,29 +100,14 @@ class _ToggleScreenState extends State<ToggleScreen>
     );
   }
 
-  var widthToggle = 300.0;
-  var heightToggle = 125.0;
-  var sizeThumb = 100.0;
-  var marginHorizontal = 12.0;
-  var borderRadius = 60.0;
-
-  _testWidget() {
-    return Container(
-      child: Container(
-        child: Container(),
-      ),
-    );
-  }
-
   _toggleWidget() {
-    var distanceMove = widthToggle - sizeThumb - 2 * marginHorizontal;
     return Container(
-      height: heightToggle,
-      width: widthToggle,
+      height: _heightToggle,
+      width: _widthToggle,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(
           Radius.circular(
-            borderRadius,
+            _borderRadius,
           ),
         ),
         boxShadow: [
@@ -131,37 +122,14 @@ class _ToggleScreenState extends State<ToggleScreen>
           ClipRRect(
             borderRadius: BorderRadius.all(
               Radius.circular(
-                borderRadius,
+                _borderRadius,
               ),
             ),
             child: Stack(
               children: [
-                _backgroundColorWidget(),
-                _backgroundImageWidget(
-                  heightToggle: heightToggle,
-                  widthToggle: widthToggle,
-                ),
-                AnimatedBuilder(
-                  animation: Listenable.merge([
-                    controller.animation,
-                    controller.gentle,
-                  ]),
-                  builder: (context, child) {
-                    var gentleValue = controller.gentle.value;
-                    if (gentleValue >= 5) {
-                      gentleValue = controller.endGentle / 2 - gentleValue;
-                    }
-                    var x =
-                        distanceMove * (controller.animation.value - 1 / 2) +
-                            gentleValue;
-                    return Transform.translate(
-                      offset: Offset(x, 0),
-                      child: _thumbWidget(
-                        sizeThumb: sizeThumb,
-                      ),
-                    );
-                  },
-                ),
+                _trackColorWidget(),
+                _trackImageWidget(),
+                _thumbWidget(),
               ],
             ),
           ),
@@ -169,7 +137,7 @@ class _ToggleScreenState extends State<ToggleScreen>
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(
                 Radius.circular(
-                  borderRadius,
+                  _borderRadius,
                 ),
               ),
               boxShadow: [
@@ -191,47 +159,44 @@ class _ToggleScreenState extends State<ToggleScreen>
     );
   }
 
-  _backgroundColorWidget() {
+  _trackColorWidget() {
     return AnimatedBuilder(
-      animation: controller.animationController,
+      animation: controller._animationController,
       builder: (context, child) {
         return Container(
-          color: controller.colorAnimation.value,
+          color: controller._backgroundColorAnimation.value,
         );
       },
     );
   }
 
-  _backgroundImageWidget({
-    required var widthToggle,
-    required var heightToggle,
-  }) {
+  _trackImageWidget() {
     return AnimatedBuilder(
       animation: Listenable.merge([
-        controller.animation,
-        controller.gentle,
+        controller.toggleAnimation,
+        controller.thumbAnimation,
       ]),
       builder: (context, child) {
-        var value = controller.animationController.value;
-        var gentleValue = controller.gentle.value;
+        var value = controller._animationController.value;
+        var gentleValue = controller.thumbAnimation.value;
         if (gentleValue >= controller.endGentle / 2) {
           gentleValue = controller.endGentle / 2 - gentleValue;
         }
-        var heightMoon = heightToggle * value + gentleValue;
-        var heightSun = heightToggle * value - heightToggle + gentleValue;
+        var heightMoon = _heightToggle * value + gentleValue;
+        var heightSun = _heightToggle * value - _heightToggle + gentleValue;
         return Stack(
           children: [
             Transform.translate(
               offset: Offset(0, heightMoon),
               child: SizedBox(
-                height: heightToggle,
-                width: widthToggle,
+                height: _heightToggle,
+                width: _widthToggle,
                 child: OverflowBox(
                   child: ClipRect(
                     clipBehavior: Clip.hardEdge,
                     child: OverflowBox(
-                      maxHeight: heightToggle,
-                      maxWidth: widthToggle,
+                      maxHeight: _heightToggle,
+                      maxWidth: _widthToggle,
                       child: Image.asset(
                         "assets/bg_sun.png",
                         fit: BoxFit.fill,
@@ -262,113 +227,134 @@ class _ToggleScreenState extends State<ToggleScreen>
     );
   }
 
-  _thumbWidget({
-    required double sizeThumb,
-  }) {
-    var value = controller.animationController.value;
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        _circleWidget(),
-        SizedBox(
-          height: sizeThumb,
-          width: sizeThumb,
+  _thumbWidget() {
+    var distanceMove = _widthToggle - _sizeThumb - 2 * _marginHorizontal;
+
+    return AnimatedBuilder(
+      animation: Listenable.merge([
+        controller.toggleAnimation,
+        controller.thumbAnimation,
+      ]),
+      builder: (context, child) {
+        var value = controller._animationController.value;
+        var gentleValue = controller.thumbAnimation.value;
+        if (gentleValue >= 5) {
+          gentleValue = controller.endGentle / 2 - gentleValue;
+        }
+        var x = distanceMove * (controller.toggleAnimation.value - 1 / 2) +
+            gentleValue;
+        return Transform.translate(
+          offset: Offset(x, 0),
           child: Stack(
+            alignment: Alignment.center,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.35),
-                      offset: const Offset(4, 4),
-                      blurRadius: 5,
-                    ),
-                    BoxShadow(
-                      color: value == 0
-                          ? const Color(0xFFF7B858)
-                          : const Color(0xFFC4D4D6),
-                    ),
-                  ],
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFFFFFFFF).withOpacity(0.58),
-                      const Color(0xFFFFFFFF).withOpacity(0.58),
-                      Colors.transparent,
-                      const Color(0xFF000000).withOpacity(0.25),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-              ),
-              Stack(
-                children: [
-                  Opacity(
-                    opacity: 1 - value,
-                    child: _moonSunWidget(
-                      const Color(0xFFF7B858),
-                    ),
-                  ),
-                  Opacity(
-                    opacity: value,
-                    child: Stack(
-                      children: [
-                        _moonSunWidget(
-                          const Color(0xFFC4D4D6),
-                        ),
-                        Stack(
-                          children: [
-                            Positioned(
-                              left: 30,
-                              top: 10,
-                              child: _childMoonWidget(15),
-                            ),
-                            Positioned(
-                              left: 15,
-                              top: 34,
-                              child: _childMoonWidget(8),
-                            ),
-                            Positioned(
-                              left: 55,
-                              top: 31,
-                              child: _childMoonWidget(19),
-                            ),
-                            Positioned(
-                              left: 55,
-                              top: 52,
-                              child: _childMoonWidget(11),
-                            ),
-                            Positioned(
-                              left: 18,
-                              top: 55,
-                              child: _childMoonWidget(14),
-                            ),
-                            Positioned(
-                              left: 70,
-                              top: 52,
-                              child: _childMoonWidget(22),
-                            ),
-                            Positioned(
-                              left: 43,
-                              top: 64,
-                              child: _childMoonWidget(15),
-                            ),
+              _circleWidget(),
+              SizedBox(
+                height: _sizeThumb,
+                width: _sizeThumb,
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.35),
+                            offset: const Offset(4, 4),
+                            blurRadius: 5,
+                          ),
+                          BoxShadow(
+                            color: value == 0
+                                ? const Color(0xFFF7B858)
+                                : const Color(0xFFC4D4D6),
+                          ),
+                        ],
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFFFFFFFF).withOpacity(0.58),
+                            const Color(0xFFFFFFFF).withOpacity(0.58),
+                            Colors.transparent,
+                            const Color(0xFF000000).withOpacity(0.25),
                           ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    ),
+                    Stack(
+                      children: [
+                        Opacity(
+                          opacity: 1 - value,
+                          child: _thumbBackgroundWidget(
+                            const Color(0xFFF7B858),
+                          ),
+                        ),
+                        Opacity(
+                          opacity: value,
+                          child: Stack(
+                            children: [
+                              _thumbBackgroundWidget(
+                                const Color(0xFFC4D4D6),
+                              ),
+                              _decorMoonWidget(),
+                            ],
+                          ),
                         ),
                       ],
-                    ),
-                  ),
-                ],
-              )
+                    )
+                  ],
+                ),
+              ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  _decorMoonWidget() {
+    return Stack(
+      children: [
+        Positioned(
+          left: 30,
+          top: 10,
+          child: _mountainWidget(15),
+        ),
+        Positioned(
+          left: 15,
+          top: 34,
+          child: _mountainWidget(8),
+        ),
+        Positioned(
+          left: 55,
+          top: 31,
+          child: _mountainWidget(19),
+        ),
+        Positioned(
+          left: 55,
+          top: 52,
+          child: _mountainWidget(11),
+        ),
+        Positioned(
+          left: 18,
+          top: 55,
+          child: _mountainWidget(14),
+        ),
+        Positioned(
+          left: 70,
+          top: 52,
+          child: _mountainWidget(22),
+        ),
+        Positioned(
+          left: 43,
+          top: 64,
+          child: _mountainWidget(15),
         ),
       ],
     );
   }
 
-  _moonSunWidget(Color color) {
+  _thumbBackgroundWidget(Color color) {
     return Container(
       margin: const EdgeInsets.all(2),
       decoration: BoxDecoration(
@@ -383,7 +369,7 @@ class _ToggleScreenState extends State<ToggleScreen>
     );
   }
 
-  _childMoonWidget(double size) {
+  _mountainWidget(double size) {
     return Container(
       width: size,
       height: size,
