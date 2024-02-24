@@ -2,12 +2,12 @@ import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 
 class ToggleController extends ChangeNotifier {
-  late AnimationController _animationController;
+  late AnimationController animationController;
   late Animation<Color?> _backgroundColorAnimation;
 
   late AnimationController _toggleController;
   late Animation<double> toggleAnimation;
-  late Animation<double> thumbAnimation;
+  late Animation<double> /**/ thumbAnimation;
 
   var begin = 0.0;
   var end = 1.0;
@@ -15,42 +15,43 @@ class ToggleController extends ChangeNotifier {
   var endGentle = 10.0;
 
   onInit(TickerProviderStateMixin provider) {
-    _animationController = AnimationController(
+    animationController = AnimationController(
       vsync: provider,
       duration: const Duration(milliseconds: 500),
     );
 
     toggleAnimation =
         Tween<double>(begin: begin, end: end).animate(CurvedAnimation(
-      parent: _animationController,
+      parent: animationController,
       curve: Curves.easeInOutCubic,
     ));
 
     _backgroundColorAnimation = ColorTween(
       begin: const Color(0xff00B1FD),
       end: const Color(0xff171B1D),
-    ).animate(_animationController);
+    ).animate(animationController);
 
     _toggleController = AnimationController(
       vsync: provider,
       duration: const Duration(milliseconds: 300),
     );
 
-    thumbAnimation = Tween<double>(begin: 0, end: 10).animate(CurvedAnimation(
+    thumbAnimation = Tween<double>(begin: beginGentle, end: endGentle)
+        .animate(CurvedAnimation(
       parent: _toggleController,
       curve: Curves.easeInOutCubic,
     ));
   }
 
   onTap() {
-    if (_animationController.value == 0) {
-      _animationController.forward().whenComplete(
+    if (animationController.value == 0) {
+      animationController.forward().whenComplete(
         () {
           _toggleController.forward();
         },
       );
     } else {
-      _animationController.reverse().whenComplete(() {
+      animationController.reverse().whenComplete(() {
         _toggleController.reverse();
       });
     }
@@ -58,7 +59,7 @@ class ToggleController extends ChangeNotifier {
 
   @override
   void dispose() {
-    _animationController.dispose();
+    animationController.dispose();
     super.dispose();
   }
 }
@@ -101,15 +102,16 @@ class _ToggleScreenState extends State<ToggleScreen>
   }
 
   _toggleWidget() {
+    var borderRadius = BorderRadius.all(
+      Radius.circular(
+        _borderRadius,
+      ),
+    );
     return Container(
       height: _heightToggle,
       width: _widthToggle,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(
-          Radius.circular(
-            _borderRadius,
-          ),
-        ),
+        borderRadius: borderRadius,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -120,11 +122,7 @@ class _ToggleScreenState extends State<ToggleScreen>
       child: Stack(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.all(
-              Radius.circular(
-                _borderRadius,
-              ),
-            ),
+            borderRadius: borderRadius,
             child: Stack(
               children: [
                 _trackColorWidget(),
@@ -135,11 +133,7 @@ class _ToggleScreenState extends State<ToggleScreen>
           ),
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(
-                Radius.circular(
-                  _borderRadius,
-                ),
-              ),
+              borderRadius: borderRadius,
               boxShadow: [
                 BoxShadow(
                   offset: const Offset(3 + 1, 3 + 5),
@@ -161,7 +155,7 @@ class _ToggleScreenState extends State<ToggleScreen>
 
   _trackColorWidget() {
     return AnimatedBuilder(
-      animation: controller._animationController,
+      animation: controller.animationController,
       builder: (context, child) {
         return Container(
           color: controller._backgroundColorAnimation.value,
@@ -177,13 +171,14 @@ class _ToggleScreenState extends State<ToggleScreen>
         controller.thumbAnimation,
       ]),
       builder: (context, child) {
-        var value = controller._animationController.value;
-        var gentleValue = controller.thumbAnimation.value;
-        if (gentleValue >= controller.endGentle / 2) {
-          gentleValue = controller.endGentle / 2 - gentleValue;
+        var value = controller.animationController.value;
+        var thumbAnimationValue = controller.thumbAnimation.value;
+        if (thumbAnimationValue >= controller.endGentle / 2) {
+          thumbAnimationValue = controller.endGentle / 2 - thumbAnimationValue;
         }
-        var heightMoon = _heightToggle * value + gentleValue;
-        var heightSun = _heightToggle * value - _heightToggle + gentleValue;
+        var heightMoon = _heightToggle * value + thumbAnimationValue;
+        var heightSun =
+            _heightToggle * value - _heightToggle + thumbAnimationValue;
         return Stack(
           children: [
             Transform.translate(
@@ -236,15 +231,15 @@ class _ToggleScreenState extends State<ToggleScreen>
         controller.thumbAnimation,
       ]),
       builder: (context, child) {
-        var value = controller._animationController.value;
-        var gentleValue = controller.thumbAnimation.value;
-        if (gentleValue >= 5) {
-          gentleValue = controller.endGentle / 2 - gentleValue;
+        var value = controller.animationController.value;
+        var thumbAnimationValue = controller.thumbAnimation.value;
+        if (thumbAnimationValue >= 5) {
+          thumbAnimationValue = controller.endGentle / 2 - thumbAnimationValue;
         }
-        var x = distanceMove * (controller.toggleAnimation.value - 1 / 2) +
-            gentleValue;
+        var dx = distanceMove * (controller.toggleAnimation.value - 1 / 2) +
+            thumbAnimationValue;
         return Transform.translate(
-          offset: Offset(x, 0),
+          offset: Offset(dx, 0),
           child: Stack(
             alignment: Alignment.center,
             children: [
