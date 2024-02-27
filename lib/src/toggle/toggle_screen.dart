@@ -7,7 +7,7 @@ class ToggleController extends ChangeNotifier {
 
   late AnimationController _toggleController;
   late Animation<double> toggleAnimation;
-  late Animation<double> /**/ thumbAnimation;
+  late Animation<double> thumbAnimation;
 
   var begin = 0.0;
   var end = 1.0;
@@ -64,15 +64,14 @@ class ToggleController extends ChangeNotifier {
   }
 }
 
-class ToggleScreen extends StatefulWidget {
-  const ToggleScreen({Key? key}) : super(key: key);
+class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
 
   @override
-  State<ToggleScreen> createState() => _ToggleScreenState();
+  State<App> createState() => _AppState();
 }
 
-class _ToggleScreenState extends State<ToggleScreen>
-    with TickerProviderStateMixin {
+class _AppState extends State<App> with TickerProviderStateMixin {
   final controller = ToggleController();
   final _widthToggle = 300.0;
   final _heightToggle = 125.0;
